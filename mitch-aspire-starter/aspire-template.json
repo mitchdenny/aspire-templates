@@ -6,7 +6,7 @@
     "projectName": {
       "type": "string",
       "required": true,
-      "defaultValue": "MitchAspireStarter",
+      "defaultValue": "AspireStarter1",
       "validation": {
         "pattern": "^[A-Za-z][A-Za-z0-9_.]*$"
       }
@@ -14,11 +14,11 @@
   },
   "substitutions": {
     "filenames": {
-      "MitchAspireStarter": "{{projectName}}"
+      "AspireStarter1": "{{projectName}}"
     },
     "content": {
-      "MitchAspireStarter": "{{projectName}}",
-      "mitchaspirestarter": "{{projectName | lowercase}}"
+      "AspireStarter1": "{{projectName}}",
+      "aspirestarter1": "{{projectName | lowercase}}"
     }
   }
 }
