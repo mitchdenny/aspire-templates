@@ -1,0 +1,10 @@
+{
+  "$schema": "https://aka.ms/aspire/template-index-schema/v1",
+  "version": 1,
+  "templates": [
+    {
+      "name": "mitch-aspire-starter",
+      "path": "./mitch-aspire-starter"
+    }
+  ]
+}

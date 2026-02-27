@@ -1,0 +1,24 @@
+{
+  "$schema": "https://aka.ms/aspire/template-schema/v1",
+  "version": 1,
+  "name": "mitch-aspire-starter",
+  "variables": {
+    "projectName": {
+      "type": "string",
+      "required": true,
+      "defaultValue": "MitchAspireStarter",
+      "validation": {
+        "pattern": "^[A-Za-z][A-Za-z0-9_.]*$"
+      }
+    }
+  },
+  "substitutions": {
+    "filenames": {
+      "MitchAspireStarter": "{{projectName}}"
+    },
+    "content": {
+      "MitchAspireStarter": "{{projectName}}",
+      "mitchaspirestarter": "{{projectName | lowercase}}"
+    }
+  }
+}
