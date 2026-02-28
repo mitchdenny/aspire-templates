@@ -3,8 +3,8 @@
   "version": 1,
   "templates": [
     {
-      "name": "mitch-aspire-starter",
-      "path": "./mitch-aspire-starter"
+      "name": "mitch-aspire-python",
+      "path": "./aspire-python"
     }
   ]
 }

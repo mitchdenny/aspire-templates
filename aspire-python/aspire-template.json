@@ -1,0 +1,24 @@
+{
+  "$schema": "https://aka.ms/aspire/template-schema/v1",
+  "version": 1,
+  "name": "mitch-aspire-python",
+  "variables": {
+    "projectName": {
+      "type": "string",
+      "required": true,
+      "defaultValue": "AspirePython",
+      "validation": {
+        "pattern": "^[A-Za-z][A-Za-z0-9_.]*$"
+      }
+    }
+  },
+  "substitutions": {
+    "filenames": {
+      "AspirePython": "{{projectName}}"
+    },
+    "content": {
+      "AspirePython": "{{projectName}}",
+      "aspirepython": "{{projectName | lowercase}}"
+    }
+  }
+}
