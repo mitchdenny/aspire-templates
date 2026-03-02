@@ -55,5 +55,61 @@
       "AspireStarter1": "{{projectName}}",
       "aspirestarter1": "{{projectName | lowercase}}"
     }
-  }
+  },
+  "postInstructions": [
+    {
+      "heading": "Get started",
+      "priority": "primary",
+      "lines": [
+        "cd {{projectName}}",
+        "dotnet run --project {{projectName}}.AppHost"
+      ]
+    },
+    {
+      "heading": "Run tests",
+      "priority": "secondary",
+      "lines": [
+        "dotnet test {{projectName}}.sln"
+      ]
+    },
+    {
+      "heading": "Redis cache setup",
+      "priority": "secondary",
+      "condition": "useRedisCache == true",
+      "lines": [
+        "Redis will start automatically via Aspire when you run the AppHost.",
+        "To connect manually: docker run -d -p 6379:6379 redis"
+      ]
+    },
+    {
+      "heading": "Database setup — PostgreSQL",
+      "priority": "secondary",
+      "condition": "dbProvider == postgres",
+      "lines": [
+        "PostgreSQL will start automatically via Aspire when you run the AppHost.",
+        "Connection string is configured in the AppHost. Run migrations with:",
+        "dotnet ef database update --project {{projectName}}.ApiService"
+      ]
+    },
+    {
+      "heading": "Database setup — SQL Server",
+      "priority": "secondary",
+      "condition": "dbProvider == sqlserver",
+      "lines": [
+        "SQL Server will start automatically via Aspire when you run the AppHost.",
+        "Connection string is configured in the AppHost. Run migrations with:",
+        "dotnet ef database update --project {{projectName}}.ApiService"
+      ]
+    },
+    {
+      "heading": "Database setup — SQLite",
+      "priority": "secondary",
+      "condition": "dbProvider == sqlite",
+      "lines": [
+        "SQLite requires no container. The database file is created automatically.",
+        "Run migrations with:",
+        "dotnet ef database update --project {{projectName}}.ApiService"
+      ]
+    }
+  ]
 }

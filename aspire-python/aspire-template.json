@@ -60,5 +60,43 @@
       "AspirePython": "{{projectName}}",
       "aspirepython": "{{projectName | lowercase}}"
     }
-  }
+  },
+  "postInstructions": [
+    {
+      "heading": "Get started",
+      "priority": "primary",
+      "lines": [
+        "cd {{projectName}}",
+        "aspire run"
+      ]
+    },
+    {
+      "heading": "Set up the Python environment",
+      "priority": "primary",
+      "lines": [
+        "cd app",
+        "uv sync",
+        "cd .."
+      ]
+    },
+    {
+      "heading": "Set up the Vue.js frontend",
+      "priority": "secondary",
+      "condition": "includeFrontend == true",
+      "lines": [
+        "cd frontend",
+        "npm install",
+        "cd .."
+      ]
+    },
+    {
+      "heading": "Run without the frontend",
+      "priority": "secondary",
+      "condition": "includeFrontend == false",
+      "lines": [
+        "The frontend was excluded. The AppHost will only start the Python API.",
+        "To add a frontend later, create a frontend/ directory with a package.json."
+      ]
+    }
+  ]
 }
