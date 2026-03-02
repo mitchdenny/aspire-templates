@@ -21,7 +21,8 @@
       "type": "boolean",
       "displayName": "Use Redis for output caching",
       "description": "Add a Redis container for distributed output caching in the web frontend.",
-      "defaultValue": false
+      "defaultValue": false,
+      "testValues": [true, false]
     },
     "dbProvider": {
       "type": "choice",
@@ -33,7 +34,8 @@
         { "value": "sqlserver", "displayName": "SQL Server" },
         { "value": "sqlite", "displayName": "SQLite (no container)" }
       ],
-      "defaultValue": "none"
+      "defaultValue": "none",
+      "testValues": ["none", "postgres", "sqlserver", "sqlite"]
     },
     "httpPort": {
       "type": "integer",
@@ -44,7 +46,8 @@
         "min": 1024,
         "max": 65535,
         "message": "Port must be between 1024 and 65535."
-      }
+      },
+      "testValues": [1024, 5180, 65535]
     }
   },
   "substitutions": {

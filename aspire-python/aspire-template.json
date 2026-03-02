@@ -26,13 +26,15 @@
         { "value": "3.12", "displayName": "Python 3.12 (LTS)" },
         { "value": "3.11", "displayName": "Python 3.11" }
       ],
-      "defaultValue": "3.13"
+      "defaultValue": "3.13",
+      "testValues": ["3.13", "3.12", "3.11"]
     },
     "includeFrontend": {
       "type": "boolean",
       "displayName": "Include Vue.js frontend",
       "description": "Include the Vue.js frontend project with Vite dev server.",
-      "defaultValue": true
+      "defaultValue": true,
+      "testValues": [true, false]
     },
     "backendPort": {
       "type": "integer",
@@ -42,7 +44,8 @@
       "validation": {
         "min": 1024,
         "max": 65535
-      }
+      },
+      "testValues": [1024, 8000]
     },
     "authorName": {
       "type": "string",
