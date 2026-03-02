@@ -12,5 +12,10 @@
       "description": ".NET Aspire starter with web frontend and API service",
       "path": "./mitch-aspire-starter"
     }
+  ],
+  "includes": [
+    {
+      "url": "https://github.com/mitchdenny/eShopLite"
+    }
   ]
 }
