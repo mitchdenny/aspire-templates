@@ -1,0 +1,25 @@
+{
+  "$schema": "https://aka.ms/aspire/template-schema/v1",
+  "version": 1,
+  "name": "demo-substitutions",
+  "displayName": "Demo: Substitutions",
+  "description": "Demonstrates filename and content substitutions. The template renames files and replaces text patterns with variable values.",
+  "scope": ["new"],
+  "variables": {
+    "projectName": {
+      "type": "string",
+      "displayName": "Project name",
+      "required": true,
+      "defaultValue": "MyApp"
+    }
+  },
+  "substitutions": {
+    "filenames": {
+      "DemoApp": "{{projectName}}"
+    },
+    "content": {
+      "DemoApp": "{{projectName}}",
+      "demoapp": "{{projectName | lowercase}}"
+    }
+  }
+}

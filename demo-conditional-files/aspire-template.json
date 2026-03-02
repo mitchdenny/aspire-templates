@@ -1,0 +1,35 @@
+{
+  "$schema": "https://aka.ms/aspire/template-schema/v1",
+  "version": 1,
+  "name": "demo-conditional-files",
+  "displayName": "Demo: Conditional Files",
+  "description": "Demonstrates conditional file inclusion. Files and directories are included or excluded based on variable values.",
+  "scope": ["new"],
+  "variables": {
+    "projectName": {
+      "type": "string",
+      "required": true,
+      "defaultValue": "ConditionalApp"
+    },
+    "includeTests": {
+      "type": "boolean",
+      "displayName": "Include test project",
+      "description": "Add a test project to the solution.",
+      "defaultValue": true
+    },
+    "includeRedis": {
+      "type": "boolean",
+      "displayName": "Include Redis cache",
+      "description": "Add Redis cache configuration files.",
+      "defaultValue": false
+    }
+  },
+  "substitutions": {
+    "filenames": { "ConditionalApp": "{{projectName}}" },
+    "content": { "ConditionalApp": "{{projectName}}" }
+  },
+  "conditionalFiles": {
+    "ConditionalApp.Tests/": "{{includeTests}}",
+    "ConditionalApp.Redis/": "{{includeRedis}}"
+  }
+}

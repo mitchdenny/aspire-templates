@@ -11,6 +11,36 @@
       "name": "mitch-aspire-starter",
       "description": ".NET Aspire starter with web frontend and API service",
       "path": "./mitch-aspire-starter"
+    },
+    {
+      "name": "demo-substitutions",
+      "description": "Demo: Filename and content substitutions",
+      "path": "./demo-substitutions"
+    },
+    {
+      "name": "demo-conditional-files",
+      "description": "Demo: Conditional file inclusion based on variable values",
+      "path": "./demo-conditional-files"
+    },
+    {
+      "name": "demo-variables",
+      "description": "Demo: All four variable types (string, boolean, choice, integer)",
+      "path": "./demo-variables"
+    },
+    {
+      "name": "demo-post-instructions",
+      "description": "Demo: Post-instructions with priority, conditions, and variable substitution",
+      "path": "./demo-post-instructions"
+    },
+    {
+      "name": "demo-localization",
+      "description": "Demo: Localized displayName and description fields",
+      "path": "./demo-localization"
+    },
+    {
+      "name": "demo-test-values",
+      "description": "Demo: testValues for aspire template test matrix generation",
+      "path": "./demo-test-values"
     }
   ],
   "includes": [

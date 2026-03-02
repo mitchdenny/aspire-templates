@@ -1,0 +1,58 @@
+{
+  "$schema": "https://aka.ms/aspire/template-schema/v1",
+  "version": 1,
+  "name": "demo-variables",
+  "displayName": "Demo: Variable Types",
+  "description": "Demonstrates all four variable types: string (with regex validation), boolean, choice, and integer (with min/max).",
+  "scope": ["new"],
+  "variables": {
+    "projectName": {
+      "type": "string",
+      "displayName": "Project name",
+      "description": "Must start with a letter, letters/digits/underscores only.",
+      "required": true,
+      "defaultValue": "VarApp",
+      "validation": {
+        "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+        "message": "Must start with a letter and contain only letters, digits, or underscores."
+      }
+    },
+    "enableLogging": {
+      "type": "boolean",
+      "displayName": "Enable structured logging",
+      "description": "A boolean variable — prompts with a yes/no confirmation.",
+      "defaultValue": true
+    },
+    "database": {
+      "type": "choice",
+      "displayName": "Database provider",
+      "description": "A choice variable — prompts with a selection list.",
+      "choices": [
+        { "value": "postgres", "displayName": "PostgreSQL" },
+        { "value": "sqlserver", "displayName": "SQL Server" },
+        { "value": "sqlite", "displayName": "SQLite" }
+      ],
+      "defaultValue": "postgres"
+    },
+    "workerCount": {
+      "type": "integer",
+      "displayName": "Worker thread count",
+      "description": "An integer variable — validates against min/max bounds.",
+      "defaultValue": 4,
+      "validation": {
+        "min": 1,
+        "max": 32,
+        "message": "Must be between 1 and 32."
+      }
+    }
+  },
+  "substitutions": {
+    "filenames": { "VarApp": "{{projectName}}" },
+    "content": {
+      "VarApp": "{{projectName}}",
+      "PLACEHOLDER_DB": "{{database}}",
+      "PLACEHOLDER_WORKERS": "{{workerCount}}",
+      "PLACEHOLDER_LOGGING": "{{enableLogging}}"
+    }
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "$schema": "https://aka.ms/aspire/template-schema/v1",
+  "version": 1,
+  "name": "demo-localization",
+  "displayName": {
+    "en": "Demo: Localization",
+    "de": "Demo: Lokalisierung",
+    "ja": "デモ：ローカライズ",
+    "es": "Demo: Localización"
+  },
+  "description": {
+    "en": "Demonstrates localizable strings. displayName and description fields can be a plain string or an object with culture-keyed translations.",
+    "de": "Zeigt lokalisierbare Zeichenketten. displayName und description können ein einfacher String oder ein Objekt mit kulturspezifischen Übersetzungen sein.",
+    "ja": "ローカライズ可能な文字列のデモ。displayNameとdescriptionはプレーン文字列またはカルチャキー付きオブジェクトにできます。"
+  },
+  "scope": ["new"],
+  "variables": {
+    "projectName": {
+      "type": "string",
+      "displayName": {
+        "en": "Project name",
+        "de": "Projektname",
+        "ja": "プロジェクト名"
+      },
+      "description": {
+        "en": "The name for your project.",
+        "de": "Der Name für Ihr Projekt.",
+        "ja": "プロジェクトの名前。"
+      },
+      "required": true,
+      "defaultValue": "LocalApp"
+    },
+    "greeting": {
+      "type": "choice",
+      "displayName": {
+        "en": "Greeting style",
+        "de": "Begrüßungsstil",
+        "ja": "挨拶スタイル"
+      },
+      "choices": [
+        {
+          "value": "formal",
+          "displayName": {
+            "en": "Formal",
+            "de": "Formell",
+            "ja": "フォーマル"
+          }
+        },
+        {
+          "value": "casual",
+          "displayName": {
+            "en": "Casual",
+            "de": "Lässig",
+            "ja": "カジュアル"
+          }
+        }
+      ],
+      "defaultValue": "formal"
+    }
+  },
+  "substitutions": {
+    "filenames": { "LocalApp": "{{projectName}}" },
+    "content": { "LocalApp": "{{projectName}}" }
+  }
+}

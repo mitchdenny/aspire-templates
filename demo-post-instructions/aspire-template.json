@@ -1,0 +1,81 @@
+{
+  "$schema": "https://aka.ms/aspire/template-schema/v1",
+  "version": 1,
+  "name": "demo-post-instructions",
+  "displayName": "Demo: Post-Instructions",
+  "description": "Demonstrates postInstructions with primary/secondary priority, variable substitution in lines, and conditional display based on variable values.",
+  "scope": ["new"],
+  "variables": {
+    "projectName": {
+      "type": "string",
+      "required": true,
+      "defaultValue": "InstructApp"
+    },
+    "useDocker": {
+      "type": "boolean",
+      "displayName": "Use Docker Compose",
+      "defaultValue": false
+    },
+    "cloudProvider": {
+      "type": "choice",
+      "displayName": "Cloud provider",
+      "choices": [
+        { "value": "none", "displayName": "None" },
+        { "value": "azure", "displayName": "Azure" },
+        { "value": "aws", "displayName": "AWS" }
+      ],
+      "defaultValue": "none"
+    }
+  },
+  "substitutions": {
+    "filenames": { "InstructApp": "{{projectName}}" },
+    "content": { "InstructApp": "{{projectName}}" }
+  },
+  "postInstructions": [
+    {
+      "heading": "Get started",
+      "priority": "primary",
+      "lines": [
+        "cd {{projectName}}",
+        "dotnet run --project {{projectName}}.AppHost"
+      ]
+    },
+    {
+      "heading": "Docker Compose setup",
+      "priority": "secondary",
+      "condition": "useDocker == true",
+      "lines": [
+        "docker compose up -d",
+        "Then run the AppHost to connect to your containers."
+      ]
+    },
+    {
+      "heading": "No Docker",
+      "priority": "secondary",
+      "condition": "useDocker == false",
+      "lines": [
+        "Aspire will manage containers for you automatically.",
+        "No Docker Compose configuration needed."
+      ]
+    },
+    {
+      "heading": "Deploy to Azure",
+      "priority": "secondary",
+      "condition": "cloudProvider == azure",
+      "lines": [
+        "azd init",
+        "azd up"
+      ]
+    },
+    {
+      "heading": "Deploy to AWS",
+      "priority": "secondary",
+      "condition": "cloudProvider == aws",
+      "lines": [
+        "Configure AWS credentials first:",
+        "aws configure",
+        "Then deploy with the Aspire AWS publisher."
+      ]
+    }
+  ]
+}

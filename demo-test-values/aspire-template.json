@@ -1,0 +1,48 @@
+{
+  "$schema": "https://aka.ms/aspire/template-schema/v1",
+  "version": 1,
+  "name": "demo-test-values",
+  "displayName": "Demo: Test Values",
+  "description": "Demonstrates the testValues property for aspire template test. Each variable defines explicit test values that control matrix generation. Run: aspire template test --dry-run",
+  "scope": ["new"],
+  "variables": {
+    "projectName": {
+      "type": "string",
+      "required": true,
+      "defaultValue": "TestApp"
+    },
+    "framework": {
+      "type": "choice",
+      "displayName": "Web framework",
+      "choices": [
+        { "value": "minimal-api", "displayName": "Minimal API" },
+        { "value": "controllers", "displayName": "MVC Controllers" },
+        { "value": "blazor", "displayName": "Blazor Server" }
+      ],
+      "defaultValue": "minimal-api",
+      "testValues": ["minimal-api", "controllers"]
+    },
+    "useHttps": {
+      "type": "boolean",
+      "displayName": "Enable HTTPS",
+      "defaultValue": true,
+      "testValues": [true, false]
+    },
+    "maxConnections": {
+      "type": "integer",
+      "displayName": "Max DB connections",
+      "defaultValue": 100,
+      "validation": { "min": 10, "max": 1000 },
+      "testValues": [10, 100, 1000]
+    }
+  },
+  "substitutions": {
+    "filenames": { "TestApp": "{{projectName}}" },
+    "content": {
+      "TestApp": "{{projectName}}",
+      "PLACEHOLDER_FRAMEWORK": "{{framework}}",
+      "PLACEHOLDER_HTTPS": "{{useHttps}}",
+      "PLACEHOLDER_MAXCONN": "{{maxConnections}}"
+    }
+  }
+}

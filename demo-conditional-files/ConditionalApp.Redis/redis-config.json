@@ -1,0 +1,5 @@
+{
+  "comment": "This file is only included when includeRedis=true",
+  "maxMemory": "256mb",
+  "evictionPolicy": "allkeys-lru"
+}
