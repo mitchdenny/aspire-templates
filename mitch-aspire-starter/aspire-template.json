@@ -2,13 +2,48 @@
   "$schema": "https://aka.ms/aspire/template-schema/v1",
   "version": 1,
   "name": "mitch-aspire-starter",
+  "displayName": "Aspire Starter Application",
+  "description": "A starter .NET Aspire application with a web frontend and API service.",
+  "scope": ["new"],
   "variables": {
     "projectName": {
       "type": "string",
+      "displayName": "Project name",
+      "description": "The name for your Aspire project. Used for solution and project directory names.",
       "required": true,
       "defaultValue": "AspireStarter1",
       "validation": {
-        "pattern": "^[A-Za-z][A-Za-z0-9_.]*$"
+        "pattern": "^[A-Za-z][A-Za-z0-9_.]*$",
+        "message": "Project name must start with a letter and contain only letters, digits, dots, or underscores."
+      }
+    },
+    "useRedisCache": {
+      "type": "boolean",
+      "displayName": "Use Redis for output caching",
+      "description": "Add a Redis container for distributed output caching in the web frontend.",
+      "defaultValue": false
+    },
+    "dbProvider": {
+      "type": "choice",
+      "displayName": "Database provider",
+      "description": "The database provider to use for the API service.",
+      "choices": [
+        { "value": "none", "displayName": "None" },
+        { "value": "postgres", "displayName": "PostgreSQL" },
+        { "value": "sqlserver", "displayName": "SQL Server" },
+        { "value": "sqlite", "displayName": "SQLite (no container)" }
+      ],
+      "defaultValue": "none"
+    },
+    "httpPort": {
+      "type": "integer",
+      "displayName": "API service HTTP port",
+      "description": "The HTTP port for the API service during development.",
+      "defaultValue": 5180,
+      "validation": {
+        "min": 1024,
+        "max": 65535,
+        "message": "Port must be between 1024 and 65535."
       }
     }
   },

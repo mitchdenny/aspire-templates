@@ -4,7 +4,13 @@
   "templates": [
     {
       "name": "mitch-aspire-python",
+      "description": "Fullstack Aspire app with Python FastAPI backend and Vue.js frontend",
       "path": "./aspire-python"
+    },
+    {
+      "name": "mitch-aspire-starter",
+      "description": ".NET Aspire starter with web frontend and API service",
+      "path": "./mitch-aspire-starter"
     }
   ]
 }

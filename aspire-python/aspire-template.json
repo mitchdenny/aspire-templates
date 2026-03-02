@@ -2,14 +2,54 @@
   "$schema": "https://aka.ms/aspire/template-schema/v1",
   "version": 1,
   "name": "mitch-aspire-python",
+  "displayName": "Aspire Python + Vue Fullstack",
+  "description": "A fullstack Aspire application with a Python FastAPI backend and Vue.js frontend.",
+  "scope": ["new"],
   "variables": {
     "projectName": {
       "type": "string",
+      "displayName": "Project name",
+      "description": "The name for your Aspire project.",
       "required": true,
       "defaultValue": "AspirePython",
       "validation": {
-        "pattern": "^[A-Za-z][A-Za-z0-9_.]*$"
+        "pattern": "^[A-Za-z][A-Za-z0-9_.]*$",
+        "message": "Project name must start with a letter and contain only letters, digits, dots, or underscores."
       }
+    },
+    "pythonVersion": {
+      "type": "choice",
+      "displayName": "Python version",
+      "description": "The Python version to use for the backend service.",
+      "choices": [
+        { "value": "3.13", "displayName": "Python 3.13 (latest)" },
+        { "value": "3.12", "displayName": "Python 3.12 (LTS)" },
+        { "value": "3.11", "displayName": "Python 3.11" }
+      ],
+      "defaultValue": "3.13"
+    },
+    "includeFrontend": {
+      "type": "boolean",
+      "displayName": "Include Vue.js frontend",
+      "description": "Include the Vue.js frontend project with Vite dev server.",
+      "defaultValue": true
+    },
+    "backendPort": {
+      "type": "integer",
+      "displayName": "Backend API port",
+      "description": "The port for the FastAPI backend during development.",
+      "defaultValue": 8000,
+      "validation": {
+        "min": 1024,
+        "max": 65535
+      }
+    },
+    "authorName": {
+      "type": "string",
+      "displayName": "Author name",
+      "description": "Your name, used in pyproject.toml metadata.",
+      "required": false,
+      "defaultValue": ""
     }
   },
   "substitutions": {
