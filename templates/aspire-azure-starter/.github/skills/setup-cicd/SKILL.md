@@ -1,15 +1,17 @@
 ---
-name: setup-production
-description: Use only when the user explicitly requests setup-production or asks to publish this Aspire app to a private GitHub repository and configure its production Azure OIDC environment. Can also configure the included PR environment when explicitly requested. Not for automatic template initialization, routine builds, deployment, or cleanup.
+name: setup-cicd
+description: Use only when the user explicitly requests setup-cicd or asks to configure this Aspire app's GitHub Actions CI/CD, including private repository publication and independent production and PR Azure OIDC environments. Not for automatic template initialization, routine builds, deployment, or cleanup.
 ---
 
-# Set up repository and Azure environments
+# Set up production and PR CI/CD
 
 This is an instruction-only, explicitly requested setup flow. Loading this skill
 or generating the template is not permission to publish code, create identities,
 grant access, deploy, or delete anything. Do not run it as a post-create action.
 Use existing Git, GitHub CLI and Azure CLI tools, respecting their normal approvals.
 Use Aspire-native deployment guidance if deployment is subsequently requested.
+The default setup plan covers both production and PR workflows; the user can
+explicitly narrow it to one environment. Obtain approval for each target.
 
 ## 1. Inspect and collect decisions
 
@@ -27,7 +29,7 @@ current Git remote, signed-in account or default Azure subscription:
 - Azure cloud, tenant, subscription, supported region and dedicated production
   resource group; application/service-principal create or reuse choice.
 - Production main-branch and environment protection policy, eligible reviewers
-  where supported, and whether PR environments should also be configured.
+  where supported, and any requested narrowing of the production/PR setup scope.
 - For PR setup: independent tenant/subscription/region and identity, plus the
   administrator-approved Azure permission scope. Never assume production access
   should be reused.
@@ -111,7 +113,7 @@ Use environment-scoped secrets and variables with the exact names below:
 | Environment | Secrets | Variables |
 |-------------|---------|-----------|
 | `production` | `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` | `AZURE_LOCATION`, `AZURE_RESOURCE_GROUP` |
-| `pr` (only if requested) | `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `PR_STATE_KEY` | `AZURE_LOCATION` |
+| `pr` | `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `PR_STATE_KEY` | `AZURE_LOCATION` |
 
 Configure future secret AppHost parameters only on the appropriate deploy job,
 using its documented `Parameters__<name>` mapping, never on the unprivileged PR
@@ -119,7 +121,9 @@ publish job. Do not expose tokens, credentials, auth payloads or secret values i
 logs, comments, artifacts, command arguments or persistent files. Supply secrets
 through a protected stdin/input channel; never print the PR state key.
 
-### Optional PR setup
+### Configure PR workflows
+
+Follow this section when PR setup is included in the approved plan.
 
 Create the separate `pr` environment with main-only branch restrictions and no
 tags. **Do not add reviewers or wait timers:** the current policy has no approval

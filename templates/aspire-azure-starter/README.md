@@ -21,10 +21,11 @@ container runtime.
 ### Optional guided setup
 
 The bundled Copilot skill at
-[`.github/skills/setup-production/SKILL.md`](.github/skills/setup-production/SKILL.md)
-can guide private repository publication and production OIDC setup, plus the
-separate PR environment if requested. Ask your agent to **use setup-production**
-and supply your target repository and Azure details. It runs only on an explicit
+[`.github/skills/setup-cicd/SKILL.md`](.github/skills/setup-cicd/SKILL.md)
+guides private repository publication and CI/CD setup for both production and
+the independent PR environment. Ask your agent to **use setup-cicd**
+and supply your target repository and Azure details, narrowing the scope if only
+one environment is needed. It runs only on an explicit
 request, not during template creation. Setup approval does not authorize pushing
 to `main` or deploying; publication requires a separate decision.
 
