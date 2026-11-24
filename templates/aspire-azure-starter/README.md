@@ -18,6 +18,16 @@ container runtime.
 
 ## Next Steps
 
+### Optional guided setup
+
+The bundled Copilot skill at
+[`.github/skills/setup-production/SKILL.md`](.github/skills/setup-production/SKILL.md)
+can guide private repository publication and production OIDC setup, plus the
+separate PR environment if requested. Ask your agent to **use setup-production**
+and supply your target repository and Azure details. It runs only on an explicit
+request, not during template creation. Setup approval does not authorize pushing
+to `main` or deploying; publication requires a separate decision.
+
 ### 1. Create your GitHub repository
 
 Create a GitHub repository with a `main` branch, then configure and protect the
