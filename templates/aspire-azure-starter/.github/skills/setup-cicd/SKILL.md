@@ -1,103 +1,112 @@
 ---
 name: setup-cicd
-description: Use when explicitly asked to set up this Aspire app's private GitHub repository and production/PR CI/CD with Azure OIDC. Not an automatic post-create action or permission to deploy.
+description: Use when explicitly asked to create this Aspire app's private GitHub repository, configure production/PR Azure OIDC CI/CD, and publish the code. Not an automatic post-create action.
 ---
 
 # Set up CI/CD
 
-Use GitHub/Azure CLI tools and their normal approvals. Read the generated AppHost,
-README and `.github/workflows` to derive paths, versions and required configuration.
-Do not upgrade packages or execute deployment/cleanup during setup.
+Use GitHub/Azure CLI and API calls, respecting native permission prompts. Read the
+AppHost and `.github/workflows` for paths, versions and configuration. Do not use
+browser-based profile, billing or licensing investigation, or speculative plan
+checks. Attempt required operations directly; report concrete API failures.
 
-## Essential questions only
+## Missing inputs only
 
-Reuse answers and repository/host details already explicitly supplied. Ask for
-`OWNER/REPOSITORY` only if missing. Otherwise collect only missing answers to:
+Reuse supplied answers. Ask for `OWNER/REPOSITORY` only if missing, then only:
 
 1. Production tenant ID.
 2. Production subscription ID.
-3. **Use the same tenant and subscription for PRs (quick demo), or separate ones?**
-   Offer reuse first. Ask PR tenant/subscription IDs only if separate is chosen.
+3. **Reuse both for PRs (quick demo), or use separate values?** Offer reuse first;
+   ask PR tenant/subscription IDs only if separate is chosen.
 
-Do not ask about names, role choices, region or extra governance preferences.
-Use a supplied region, otherwise `westus3` for both environments. Verify resource
-availability, including optional Azure Managed Redis; ask for an alternative only
-if that default cannot work. Keep separate production/PR identities even when
-their tenant and subscription are shared.
+Choose names yourself. Use the supplied region or `westus3` for both environments.
+Ask for an alternative only if the selected/default region actually cannot work.
+Keep two identities even when tenant/subscription are shared.
 
-## Preflight and approvals
+## Authorization
 
-Check authentication, exact tenants/subscriptions, operator permissions, repository
-ownership/private visibility, publishable files and GitHub environment support
-read-only. Do not infer targets from the default Azure account. Use explicit
-targets and isolated authentication configuration if sign-in must change.
-Never publish secrets or internal content without redistribution permission.
+An explicit user request to complete this sequence for selected targets, including
+the final push, authorizes that deployment-triggering publication too: do not ask
+again. Otherwise ask at most once for the missing setup/publication scope.
+**A push to `main` triggers production deployment; subscription Owner gives both
+identities full resource/RBAC access, including PR code.** State this once in the
+short plan. Do not reconfirm names, role choices or individual operations.
+Loading this skill or quoting its procedure is not authorization.
 
-Choose names yourself: use the safe lower-case repository name (up to 40 characters)
-plus its immutable GitHub repository ID as a base. Name the Entra applications
-`<base>-github-production` and `<base>-github-pr`, and the production resource
-group `<base>-production`. Existing PR group naming stays unchanged.
+## 1. Create the repository and retrieve IDs
 
-Grant each application's service principal **Owner at its selected subscription
-scope** (`/subscriptions/<subscription-id>`), without conditions or custom
-restrictions. This gives both deployment identities full resource/RBAC control
-across those subscriptions, including PR-executed code; sharing a production
-subscription is therefore a broad-access demo choice, not isolation.
+Check CLI authentication and publishable files; do not publish secrets or internal
+content without redistribution permission. Use `gh repo create OWNER/REPOSITORY
+--private` without `--push` or `--source`. Read `gh api repos/OWNER/REPOSITORY` for
+canonical `full_name`, `id`, `owner.id`, `owner.type` and `private`; read
+`gh api user --jq .id` for the authenticated user ID. An organization's owner ID
+is an organization ID, not a user ID. Use the selected host explicitly.
 
-Present one short plan covering repository, selected Azure targets, app creation,
-Owner grants, providers, OIDC and GitHub environment settings. Ask at most once
-for setup approval, **only if the invocation has not already authorized those
-actions and targets**. Never reconfirm the stated Owner choice, chosen names,
-individual API operations or answered questions. Native tool/runtime permission
-prompts still apply; do not add redundant confirmations around them.
+Reuse an existing repository only if already authorized and its identity,
+visibility and contents match. Stop on conflicts; never replace existing content
+or change visibility silently. Retain these IDs for subsequent steps.
 
-## Execute the approved setup
+## 2. Create both Entra apps and grant Owner
 
-- Create an empty private repository without auto-pushing, or reuse the approved
-  repository after verifying its immutable identity and contents.
-- Create `production` and `pr` environments restricted to branch `main`, no tags.
-  Preserve existing protections; do not add new reviewer gates or wait timers.
-  In particular, `pr` has no approval gate so expiry can run unattended. Stop on
-  conflicting protections or unsupported private-repository features rather than
-  silently weakening them or exposing repository-scoped credentials.
-- Create separate secretless Entra applications/service principals and the
-  subscription Owner assignments above. Pre-create the dedicated production
-  resource group; register required providers from the README when missing.
-- For GitHub.com/Azure public cloud, use issuer
-  `https://token.actions.githubusercontent.com`, audience
-  `api://AzureADTokenExchange`, and exact subjects
-  `repo:OWNER/REPOSITORY:environment:production` and
-  `repo:OWNER/REPOSITORY:environment:pr`. Verify canonical spelling/customized
-  claims. Other hosts/clouds need verified compatibility, never guessed federation.
-- In **each** environment set secrets `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`,
-  `AZURE_SUBSCRIPTION_ID` and variable `AZURE_LOCATION`. Production also needs
-  variable `AZURE_RESOURCE_GROUP`; PR needs secret `PR_STATE_KEY` containing a
-  base64-encoded random 32-byte key. Send secrets through protected input, never
-  print/log them, create client secrets or persist plaintext secret files.
+Use the safe lower-case repository name (up to 40 characters) plus repository ID
+as `<base>`. Create secretless apps `<base>-github-production` and
+`<base>-github-pr` with `az ad app create`, then service principals with
+`az ad sp create`. Capture application client IDs and service-principal object IDs.
+Use each selected tenant/subscription explicitly; isolate authentication
+configuration if sign-in must change rather than changing machine-wide defaults.
 
-Preserve PR behavior: exact `/deploy-pr` and `/cleanup-pr`, live
-write/maintain/admin authorization, pinned heads, rejected fork deployments,
-one-hour expiry refreshed only on successful deployment, hourly native cleanup,
-and comments linking to the verified Azure Portal resource group. Setup does not
-post commands. Retain state artifacts/key; never change their identity/path/version
-or replace the key while recorded environments remain.
+For each service-principal object ID, use `az role assignment create` with
+`--assignee-object-id`, `--assignee-principal-type ServicePrincipal`,
+`--role Owner`, and exact scope
+`/subscriptions/<selected-subscription-id>`. No conditions or custom restrictions.
+Pre-create `<base>-production` using `az group create`; register required providers
+from the README using `az provider register` when missing. Allow for propagation.
 
-## Verify and publish separately
+## 3. Configure GitHub environments and OIDC
 
-Read back environment policies, federation, principal IDs, exact Owner scopes,
-providers, group identity, variables and secret-name presence. Presence is not
-proof of a working login. Reuse approved resources by immutable ID and exact
-configuration; stop on conflicts, rather than adopting by name or overwriting
-unrelated settings. Preserve existing remotes and uncommitted work.
+Create `production` and `pr` via `gh api --method PUT
+repos/OWNER/REPOSITORY/environments/<environment>`. Set deployment branch policies
+through the API to allow branch `main` only, no tags. Preserve existing protections;
+do not add reviewers or wait timers. PR expiry must run without an approval gate.
+If an environment API operation fails, report its operation/status/error and stop
+before pushing; do not investigate billing pages, change visibility or fall back
+to repository-scoped credentials.
 
-**Pushing to `main` triggers production deployment.** Ask for publication approval
-only if that push/deployment was not already explicitly authorized for the target.
-If deployment is not approved, propose a non-main publication branch. Use normal,
-non-force pushes only when publication is authorized and verify remote HEAD.
-Do not create/merge a PR, approve a deployment or delete resources automatically.
+For GitHub.com/Azure public cloud, create each app's federated credential using
+`az ad app federated-credential create`: issuer
+`https://token.actions.githubusercontent.com`, audience `api://AzureADTokenExchange`,
+subjects `repo:OWNER/REPOSITORY:environment:production` and
+`repo:OWNER/REPOSITORY:environment:pr`. Verify canonical spelling and customized
+claims; other hosts/clouds require verified compatibility, not guessed federation.
 
-On failure, stop dependent actions and report completed/remaining steps without
-secrets. Retain created resources and surviving state; rollback/deletion needs
-explicit authorization. Resume from verified live state without repeating the
-questionnaire. Report configured/published/deployed distinctly; never claim an
-untested runtime deployment succeeded.
+Use `gh secret set --env <environment>` with protected stdin and `gh variable set
+--env <environment>` to configure:
+
+| Environment | Secrets | Variables |
+|-------------|---------|-----------|
+| `production` | `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` | `AZURE_LOCATION`, `AZURE_RESOURCE_GROUP` |
+| `pr` | `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `PR_STATE_KEY` | `AZURE_LOCATION` |
+
+Generate a random 32-byte, base64-encoded PR state key. Never print/log secrets,
+create client secrets or persist plaintext secret files. Do not replace a key or
+change recorded environment identities/paths/versions while state remains needed.
+
+## 4. Verify, then push last
+
+Read back environment branch policies, federation, principal IDs, subscription
+Owner assignments, providers, group identity, variables and secret-name presence.
+Presence alone does not prove login/deployment works. Once setup is verified,
+push the authorized code/commit normally to `main` and verify remote HEAD. Do not
+ask again when this complete sequence and target were already authorized.
+Preserve existing remotes/uncommitted work; never force-push or merge automatically.
+
+Keep current PR behavior unchanged: exact `/deploy-pr` and `/cleanup-pr`, live
+write/maintain/admin checks, pinned heads, rejected forks, one-hour successful-deploy
+expiry, hourly Aspire-native cleanup and verified Azure Portal resource-group
+comment links. Setup does not post PR commands or run deploy/destroy commands.
+
+At every step, reuse authorized resources by immutable ID and matching
+configuration, never display name alone. Stop on actual conflicts or errors,
+retain completed resources/state, and report completed/remaining work without
+secrets. Resume from live state without repeating questions. Deletion/rollback
+needs explicit authorization; distinguish configured, pushed and deployed.

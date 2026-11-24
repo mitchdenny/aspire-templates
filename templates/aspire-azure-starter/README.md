@@ -27,9 +27,11 @@ target repository, production tenant ID and subscription ID. Reuse those Azure
 values for PRs for a quick demo, or supply separate ones. Names are chosen for you.
 Guided setup grants each Entra service principal **unrestricted Owner on its
 selected subscription**, including PR code's access; this is broad demo access.
-It asks at most once for setup approval, only if not already authorized; a
-deployment-triggering push needs approval only if not already authorized too.
-Native tool permission prompts still apply. It never runs during template creation.
+The CLI/API flow creates the repository and retrieves IDs, creates both Entra apps
+and Owner grants, configures GitHub environments/OIDC, then pushes last. Explicitly
+authorizing that full sequence includes the deployment-triggering push, without
+repeat confirmations. Native tool prompts still apply; this is never a post-create
+action.
 
 ### 1. Create your GitHub repository
 
