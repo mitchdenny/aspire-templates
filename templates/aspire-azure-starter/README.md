@@ -22,12 +22,14 @@ container runtime.
 
 The bundled Copilot skill at
 [`.github/skills/setup-cicd/SKILL.md`](.github/skills/setup-cicd/SKILL.md)
-guides private repository publication and CI/CD setup for both production and
-the independent PR environment. Ask your agent to **use setup-cicd**
-and supply your target repository and Azure details, narrowing the scope if only
-one environment is needed. It runs only on an explicit
-request, not during template creation. Setup approval does not authorize pushing
-to `main` or deploying; publication requires a separate decision.
+guides production and PR setup. Ask your agent to **use setup-cicd** with your
+target repository, production tenant ID and subscription ID. Reuse those Azure
+values for PRs for a quick demo, or supply separate ones. Names are chosen for you.
+Guided setup grants each Entra service principal **unrestricted Owner on its
+selected subscription**, including PR code's access; this is broad demo access.
+It asks at most once for setup approval, only if not already authorized; a
+deployment-triggering push needs approval only if not already authorized too.
+Native tool permission prompts still apply. It never runs during template creation.
 
 ### 1. Create your GitHub repository
 
@@ -67,7 +69,10 @@ branch restrictions are essential: an environment-based OIDC subject does not
 itself restrict a token to `main`. These protections also matter for same-repository
 PRs, which can change workflow code. Never approve a deployment of untrusted code.
 
-### 3. Bootstrap Azure access
+### 3. Bootstrap Azure access manually (resource-group scoped)
+
+The manual alternative below uses narrower resource-group-scoped roles, unlike
+the guided skill's subscription-wide Owner grants.
 
 Run the following Bash commands yourself in a trusted terminal after installing
 the [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli).
@@ -263,12 +268,14 @@ Container Apps environment or resource group. Do not put production or unrelated
 resources into these groups: native Aspire teardown deletes the whole group.
 An existing group is never adopted based on its name alone.
 
-Have an administrator design the PR identity's Azure permissions deliberately.
+Guided demo setup grants the PR identity unrestricted subscription Owner. If you
+reuse the production subscription, PR code has that same broad access.
+For narrower, non-demo access, have an administrator design permissions deliberately.
 Unlike production's pre-created group, a first PR deployment creates a group:
 it needs group-creation permission plus deployment/tagging and managed-identity
 role-assignment rights for that group's resources. Use a dedicated PR subscription
-or administrator-managed, pre-scoped access; do not give PR-executed code
-subscription-wide access to a production subscription. Environment variables are
+or administrator-managed, pre-scoped access rather than broad access to a shared
+production subscription. Environment variables are
 not an RBAC security boundary. The workflows do not grant Azure roles or register
 providers. Required resource providers must already be registered.
 
