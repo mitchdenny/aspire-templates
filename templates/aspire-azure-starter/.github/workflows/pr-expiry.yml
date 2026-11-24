@@ -1,0 +1,54 @@
+name: Expire PR environments
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+
+permissions: {}
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: pr
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      prs: ${{ steps.discover.outputs.prs }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Find expired authenticated deployment records
+        id: discover
+        uses: actions/github-script@v9
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_STATE_KEY: ${{ secrets.PR_STATE_KEY }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        with:
+          script: |
+            const { run } = await import(`${process.env.GITHUB_WORKSPACE}/.github/pr-environments/lifecycle.mjs`);
+            await run({ github, context, core }, 'discover');
+
+  cleanup:
+    if: success() && needs.discover.outputs.prs != '' && needs.discover.outputs.prs != '[]'
+    needs: discover
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        pr: ${{ fromJSON(needs.discover.outputs.prs) }}
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+      id-token: write
+    uses: ./.github/workflows/pr-operation.yml
+    with:
+      operation: expire
+      pr: ${{ format('{0}', matrix.pr) }}
+    secrets: inherit

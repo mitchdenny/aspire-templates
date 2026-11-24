@@ -183,3 +183,116 @@ Published output is temporary and is not uploaded as an artifact, since generate
 deployment files can contain sensitive configuration as the app evolves.
 Review costs and your cleanup policy before the first deployment; this workflow
 does not automatically destroy resources.
+
+## On-demand PR environments
+
+The separate PR workflows do not deploy automatically when a PR is opened.
+Once these files exist on the repository's **main default branch**, a human
+collaborator with live **write, maintain or admin** permission can post exactly:
+
+```text
+/deploy-pr
+```
+
+or:
+
+```text
+/cleanup-pr
+```
+
+No arguments, extra text, edited comments or bot comments are accepted. Deploy
+requires an open PR targeting `main` whose head belongs to this repository;
+**fork PR deployments are rejected**. Cleanup also works for closed PRs.
+Permissions and PR identity are checked again before the operation; a changed
+head requires a new command. The initial comment identifies the pinned commit;
+a rerun cannot silently repin the same deploy comment to a different head.
+The result updates that same bot-owned comment with a workflow-run link and
+the verified Azure Portal resource-group link. Cleanup reports an actually absent
+group as deleted, or an asynchronous deletion still in progress as pending.
+
+**Posting `/deploy-pr` explicitly trusts the pinned PR code with the PR Azure
+identity. There is no separate approval gate.** Review all of that code first,
+including AppHost, build targets and dependencies. The same-repository restriction
+is not a sandbox or proof that the code is safe. Protect the default branch and
+review workflow/helper changes. Authorization and cleanup helpers come only from
+the trusted default-branch workflow revision, never from the PR checkout.
+
+### Configure the shared `pr` environment
+
+Create a GitHub environment named **pr**, independently of **production**. Allow
+deployment from branch **main** only, with no tags. Do not configure required
+reviewers or wait timers if expiry must run unattended. Private repositories need
+a GitHub plan supporting environments, environment secrets and branch restrictions;
+if that is unavailable, stop rather than exposing credentials or weakening scope.
+
+| Kind | Name | Value |
+|------|------|-------|
+| Secret | `AZURE_CLIENT_ID` | Dedicated PR Entra application's client ID |
+| Secret | `AZURE_TENANT_ID` | PR identity's tenant ID |
+| Secret | `AZURE_SUBSCRIPTION_ID` | PR deployment subscription ID |
+| Secret | `PR_STATE_KEY` | Base64-encoded random 32-byte encryption key |
+| Variable | `AZURE_LOCATION` | Supported PR deployment region |
+
+Generate the state key locally using `openssl rand -base64 32`, then enter it
+directly as an environment secret; do not commit it or post it in comments.
+Retain this key until all recorded environments have been cleaned up.
+
+Use a separate Entra application/federated credential for PRs. For this
+GitHub.com/Azure public-cloud workflow, its issuer is
+`https://token.actions.githubusercontent.com`, audience is
+`api://AzureADTokenExchange`, and subject is
+`repo:OWNER/REPOSITORY:environment:pr`. Check any customized GitHub OIDC subject
+before configuring federation. Do not grant a PR-branch or fork credential.
+No Azure client secret is used.
+
+Every PR gets `aspire-pr-<immutable-repository-id>-<PR-number>` as its dedicated
+resource group and `pr-<PR-number>` as its Aspire environment. A single shared
+GitHub environment supplies identity/configuration; it is not a shared Azure
+Container Apps environment or resource group. Do not put production or unrelated
+resources into these groups: native Aspire teardown deletes the whole group.
+An existing group is never adopted based on its name alone.
+
+Have an administrator design the PR identity's Azure permissions deliberately.
+Unlike production's pre-created group, a first PR deployment creates a group:
+it needs group-creation permission plus deployment/tagging and managed-identity
+role-assignment rights for that group's resources. Use a dedicated PR subscription
+or administrator-managed, pre-scoped access; do not give PR-executed code
+subscription-wide access to a production subscription. Environment variables are
+not an RBAC security boundary. The workflows do not grant Azure roles or register
+providers. Required resource providers must already be registered.
+
+### Expiry, state and recovery
+
+A successful deployment expires **one hour after completion**. Only another
+successful `/deploy-pr` refreshes expiry; comments, commits and failed redeploys
+do not extend an existing lease. Hourly scheduled checks attempt cleanup, so
+actual removal can be later than one hour because of scheduling, queues or Azure
+deletion latency. No immediate PR-close cleanup is configured.
+
+Deployment and all cleanup paths share a per-PR concurrency lock and never cancel
+an active operation. Scheduled cleanup re-reads the newest record under that lock,
+so a renewed lease is not deleted using an older discovery result. It discovers
+authenticated repository-owned records, not every group matching a prefix.
+
+Native Aspire state and its ownership/expiry record are encrypted with
+AES-256-GCM before being retained as an Actions artifact for 90 days. No plaintext
+deployment state, native logs or credentials are uploaded or posted. The state
+contains the verified subscription/group, immutable repository/PR identity and a
+deployment marker checked against live group tags. Cleanup uses `aspire destroy`
+with restored native state and a trusted default-branch AppHost at the same path;
+it never executes the PR's cleanup code or falls back to raw Azure deletion.
+
+Do not delete the state artifacts, rotate the key, rename the repository/AppHost
+path, change PR tenant/subscription or upgrade the Aspire version while recorded
+groups remain. Missing, expired, corrupted or mismatched state fails closed,
+rather than restoring older state or deleting a guessed target. Cancelled runners,
+artifact-upload failures or failures before native state is saved can require
+operator recovery: retain any surviving state and verify the exact group before
+manual intervention. Do not interpret a failed workflow as successful cleanup.
+Partial deploy state is retained when available; failed/pending cleanup can retry.
+
+You can run the helper's focused checks locally without GitHub/Azure mutations:
+
+```bash
+node --test .github/pr-environments/lifecycle.test.mjs
+```
