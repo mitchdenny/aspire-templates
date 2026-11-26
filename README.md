@@ -15,6 +15,19 @@ the workflow's CLI version to the shared Aspire package version and select the
 
 ## Create an app
 
+| Template | Layout |
+|----------|--------|
+| `aspire-azure-starter` | Blazor frontend and ASP.NET Core API |
+| `aspire-azure-cs-ts-starter` | React/TypeScript Vite frontend, ASP.NET Core server and C# AppHost |
+
+Both include Azure Container Apps deployment, authorized PR environment workflows,
+the `setup-cicd` skill and a generated Visual Studio `.gitignore`. The React
+starter is based on the official
+[`aspire-ts-cs-starter`](https://github.com/microsoft/aspire/tree/b2baebe8864c718587bd7d13cfe5460a80f83062/src/Aspire.ProjectTemplates/templates/aspire-ts-cs-starter),
+pinned to `b2baebe8864c718587bd7d13cfe5460a80f83062`. It preserves the upstream
+C#/React architecture and options; only the Azure integration and CI/CD plumbing
+are added. Node.js 24 LTS is needed for its frontend.
+
 Install the [.NET 10 SDK](https://dotnet.microsoft.com/download) and
 [Aspire CLI](https://aspire.dev/get-started/install-cli/) (17 or later). From this
 repository, generate an app outside the template sources:
@@ -34,6 +47,10 @@ No deployment is performed by generation. Local caching requires a container
 runtime; local development does not require Azure credentials.
 If the CLI detects an organizational configuration source, add
 `--use-config-source false` to use only this starter.
+
+For the React starter, use `--template-path ./templates/aspire-azure-cs-ts-starter`
+instead. It supports caching, framework, HTTPS and `.dev.localhost` options,
+but does not include the Blazor starter's optional test project.
 
 The generated `.github/workflows/azure.yml` builds and publishes deployment
 artifacts for PRs and `main` pushes; a successful `main` push then deploys to Azure.

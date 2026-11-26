@@ -1,0 +1,413 @@
+{
+  "$schema": "https://json.schemastore.org/template",
+  "author": "Microsoft",
+  "generatorVersions": "1.0.0.0",
+  "classifications": [
+    "Common",
+    "Aspire",
+    "Cloud",
+    "Web",
+    "Web API",
+    "API",
+    "Service",
+    "TypeScript",
+    "React"
+  ],
+  "name": "aspire-azure-cs-ts-starter",
+  "defaultName": "AspireApp",
+  "description": "React and C# starter on Azure Container Apps, with optional Azure Managed Redis caching.",
+  "shortName": "aspire-azure-cs-ts-starter",
+  "sourceName": "Aspire-StarterApplication.1",
+  "preferNameDirectory": false,
+  "tags": {
+    "language": "C#",
+    "type": "solution",
+    "editorTreatAs": "solution"
+  },
+  "precedence": "9000",
+  "identity": "Personal.Aspire.Azure.CSharp.TypeScript",
+  "thirdPartyNotices": "https://aka.ms/aspire/third-party-notices",
+  "groupIdentity": "Personal.Aspire.Azure.CSharp.TypeScript",
+  "guids": [
+    "98048C9C-BF28-46BA-A98E-63767EE5E3A8"
+  ],
+  "sources": [
+    {
+      "source": "./",
+      "target": "./",
+      "modifiers": [
+        {
+          "condition": "(hostIdentifier != \"dotnetcli\" && hostIdentifier != \"dotnetcli-preview\")",
+          "exclude": [
+            "*.slnx"
+          ]
+        }
+      ]
+    }
+  ],
+  "symbols": {
+    "AspirePackagesVersion": {
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "17.0.0",
+      "description": "The shared version of Aspire packages.",
+      "replaces": "17.0.0",
+      "onlyIf": [{ "after": " Version=\"", "before": "\"" }]
+    },
+    "WorkflowAspireVersion": {
+      "type": "derived",
+      "valueSource": "AspirePackagesVersion",
+      "valueTransform": "identity",
+      "replaces": "HostingAppHostPackageVersion"
+    },
+    "WorkflowDotnetSdkVersion": {
+      "type": "generated",
+      "generator": "switch",
+      "replaces": "TemplateDotnetSdkVersion",
+      "parameters": {
+        "cases": [
+          { "condition": "(Framework == \"net11.0\")", "value": "11.0.x" },
+          { "condition": "", "value": "10.0.x" }
+        ]
+      }
+    },
+    "WorkflowDotnetSdkQuality": {
+      "type": "generated",
+      "generator": "switch",
+      "replaces": "TemplateDotnetSdkQuality",
+      "parameters": {
+        "cases": [
+          { "condition": "(Framework == \"net11.0\")", "value": "preview" },
+          { "condition": "", "value": "ga" }
+        ]
+      }
+    },
+    "Framework": {
+      "type": "parameter",
+      "description": "The target framework for the project.",
+      "datatype": "choice",
+      "choices": [
+        {
+          "choice": "net10.0",
+          "description": "Target net10.0"
+        },
+        {
+          "choice": "net11.0",
+          "description": "Target net11.0"
+        }
+      ],
+      "replaces": "net10.0",
+      "defaultValue": "net10.0"
+    },
+    "hostIdentifier": {
+      "type": "bind",
+      "binding": "HostIdentifier"
+    },
+    "UseRedisCache": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false",
+      "displayName": "_Use Azure Managed Redis for caching",
+      "description": "Use Azure Managed Redis for deployment and a local Redis container for development."
+    },
+    "appHostHttpPort": {
+      "type": "parameter",
+      "datatype": "integer",
+      "description": "Port number to use for the HTTP endpoint in launchSettings.json of the AppHost project."
+    },
+    "appHostHttpPortGenerated": {
+      "type": "generated",
+      "generator": "port",
+      "parameters": {
+        "low": 15000,
+        "high": 15300
+      }
+    },
+    "appHostHttpPortReplacer": {
+      "type": "generated",
+      "generator": "coalesce",
+      "parameters": {
+        "sourceVariableName": "appHostHttpPort",
+        "fallbackVariableName": "appHostHttpPortGenerated"
+      },
+      "replaces": "15000"
+    },
+    "appHostOtlpHttpPort": {
+      "type": "parameter",
+      "datatype": "integer",
+      "description": "Port number to use for the OTLP HTTP endpoint in launchSettings.json of the AppHost project."
+    },
+    "appHostOtlpHttpPortGenerated": {
+      "type": "generated",
+      "generator": "port",
+      "parameters": {
+        "low": 19000,
+        "high": 19300
+      }
+    },
+    "appHostOtlpHttpPortReplacer": {
+      "type": "generated",
+      "generator": "coalesce",
+      "parameters": {
+        "sourceVariableName": "appHostOtlpHttpPort",
+        "fallbackVariableName": "appHostOtlpHttpPortGenerated"
+      },
+      "replaces": "19000"
+    },
+    "appHostResourceHttpPort": {
+      "type": "parameter",
+      "datatype": "integer",
+      "description": "Port number to use for the resource service HTTP endpoint in launchSettings.json of the AppHost project."
+    },
+    "appHostResourceHttpPortGenerated": {
+      "type": "generated",
+      "generator": "port",
+      "parameters": {
+        "low": 20000,
+        "high": 20300
+      }
+    },
+    "appHostResourceHttpPortReplacer": {
+      "type": "generated",
+      "generator": "coalesce",
+      "parameters": {
+        "sourceVariableName": "appHostResourceHttpPort",
+        "fallbackVariableName": "appHostResourceHttpPortGenerated"
+      },
+      "replaces": "20000"
+    },
+    "appHostHttpsPort": {
+      "type": "parameter",
+      "datatype": "integer",
+      "description": "Port number to use for the HTTPS endpoint in launchSettings.json of the AppHost project. This option is only applicable when the parameter no-https is not used."
+    },
+    "appHostHttpsPortGenerated": {
+      "type": "generated",
+      "generator": "port",
+      "parameters": {
+        "low": 17000,
+        "high": 17300
+      }
+    },
+    "appHostHttpsPortReplacer": {
+      "type": "generated",
+      "generator": "coalesce",
+      "parameters": {
+        "sourceVariableName": "appHostHttpsPort",
+        "fallbackVariableName": "appHostHttpsPortGenerated"
+      },
+      "replaces": "17000"
+    },
+    "appHostOtlpHttpsPort": {
+      "type": "parameter",
+      "datatype": "integer",
+      "description": "Port number to use for the OTLP HTTPS endpoint in launchSettings.json of the AppHost project."
+    },
+    "appHostOtlpHttpsPortGenerated": {
+      "type": "generated",
+      "generator": "port",
+      "parameters": {
+        "low": 21000,
+        "high": 21300
+      }
+    },
+    "appHostOtlpHttpsPortReplacer": {
+      "type": "generated",
+      "generator": "coalesce",
+      "parameters": {
+        "sourceVariableName": "appHostOtlpHttpsPort",
+        "fallbackVariableName": "appHostOtlpHttpsPortGenerated"
+      },
+      "replaces": "21000"
+    },
+    "appHostResourceHttpsPort": {
+      "type": "parameter",
+      "datatype": "integer",
+      "description": "Port number to use for the resource service HTTPS endpoint in launchSettings.json of the AppHost project."
+    },
+    "appHostResourceHttpsPortGenerated": {
+      "type": "generated",
+      "generator": "port",
+      "parameters": {
+        "low": 22000,
+        "high": 22300
+      }
+    },
+    "appHostResourceHttpsPortReplacer": {
+      "type": "generated",
+      "generator": "coalesce",
+      "parameters": {
+        "sourceVariableName": "appHostResourceHttpsPort",
+        "fallbackVariableName": "appHostResourceHttpsPortGenerated"
+      },
+      "replaces": "22000"
+    },
+    "serverHttpPort": {
+      "type": "parameter",
+      "datatype": "integer",
+      "description": "Port number to use for the HTTP endpoint in launchSettings.json of the Server project."
+    },
+    "serverHttpPortGenerated": {
+      "type": "generated",
+      "generator": "port",
+      "parameters": {
+        "low": 5301,
+        "high": 5600
+      }
+    },
+    "serverHttpPortReplacer": {
+      "type": "generated",
+      "generator": "coalesce",
+      "parameters": {
+        "sourceVariableName": "serverHttpPort",
+        "fallbackVariableName": "serverHttpPortGenerated"
+      },
+      "replaces": "5301"
+    },
+    "serverHttpsPort": {
+      "type": "parameter",
+      "datatype": "integer",
+      "description": "Port number to use for the HTTPS endpoint in launchSettings.json of the Server project. This option is only applicable when the parameter no-https is not used."
+    },
+    "serverHttpsPortGenerated": {
+      "type": "generated",
+      "generator": "port",
+      "parameters": {
+        "low": 7301,
+        "high": 7600
+      }
+    },
+    "serverHttpsPortReplacer": {
+      "type": "generated",
+      "generator": "coalesce",
+      "parameters": {
+        "sourceVariableName": "serverHttpsPort",
+        "fallbackVariableName": "serverHttpsPortGenerated"
+      },
+      "replaces": "7301"
+    },
+    "skipRestore": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "If specified, skips the automatic restore of the project on create.",
+      "defaultValue": "false"
+    },
+    "HasHttpsProfile": {
+      "type": "computed",
+      "value": "(!NoHttps)"
+    },
+    "NoHttps": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false",
+      "description": "Whether to turn off HTTPS."
+    },
+    "GeneratedClassNamePrefix": {
+      "type": "generated",
+      "generator": "regex",
+      "datatype": "string",
+      "replaces": "GeneratedClassNamePrefix",
+      "parameters": {
+        "source": "name",
+        "steps": [
+          {
+            "regex": "(((?<=\\.)|^)(?=\\d)|\\W)",
+            "replacement": "_"
+          }
+        ]
+      }
+    },
+    "XmlEncodedProjectName": {
+      "type": "derived",
+      "datatype": "string",
+      "replaces": "XmlEncodedProjectName",
+      "valueSource": "name",
+      "valueTransform": "xmlEncode"
+    },
+    "LocalhostTld": {
+      "type": "parameter",
+      "datatype": "bool",
+      "isEnabled": "(Framework == net10.0 || Framework == net11.0)",
+      "defaultValue": "false",
+      "displayName": "Use the .dev.localhost TLD in the application URL",
+      "description": "Whether to combine the project name with the .dev.localhost TLD in the application URL for local development, e.g. https://myapp.dev.localhost:12345. Supported on .NET 10 and later."
+    },
+    "hostName": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "lowerCaseInvariantWithHyphens",
+      "replaces": "LocalhostTldHostNamePrefix"
+    }
+  },
+  "forms": {
+    "lowerCaseInvariantWithHyphens": {
+      "identifier": "chain",
+      "steps": [
+        "lowerCaseInvariant",
+        "replaceDnsInvalidCharsWithHyphens",
+        "replaceRepeatedHyphens",
+        "trimLeadingHyphens",
+        "trimTrailingHyphens"
+      ]
+    },
+    "replaceDnsInvalidCharsWithHyphens": {
+      "identifier": "replace",
+      "pattern": "[^a-z0-9-]",
+      "replacement": "-"
+    },
+    "replaceRepeatedHyphens": {
+      "identifier": "replace",
+      "pattern": "-{2,}",
+      "replacement": "-"
+    },
+    "trimLeadingHyphens": {
+      "identifier": "replace",
+      "pattern": "^-+",
+      "replacement": ""
+    },
+    "trimTrailingHyphens": {
+      "identifier": "replace",
+      "pattern": "-+$",
+      "replacement": ""
+    }
+  },
+  "primaryOutputs": [
+    {
+      "path": "Aspire-StarterApplication.1.slnx",
+      "condition": "(hostIdentifier == \"dotnetcli\" || hostIdentifier == \"dotnetcli-preview\")"
+    },
+    {
+      "path": "Aspire-StarterApplication.1.AppHost\\Aspire-StarterApplication.1.AppHost.csproj"
+    },
+    {
+      "path": "Aspire-StarterApplication.1.Server\\Aspire-StarterApplication.1.Server.csproj"
+    },
+    {
+      "path": "frontend\\frontend.esproj"
+    }
+  ],
+  "postActions": [
+    {
+      "id": "set-startup-project",
+      "description": "Sets the startup project in the solution",
+      "manualInstructions": [{ "text": "" }],
+      "actionId": "5BECCC32-4D5A-4476-A0F9-BD2E81AF0689",
+      "condition": "(hostIdentifier == \"vs\")",
+      "args": {
+        "projects": "0"
+      }
+    },
+    {
+      "id": "restore",
+      "condition": "(!skipRestore)",
+      "description": "Restore NuGet packages required by this project.",
+      "manualInstructions": [
+        {
+          "text": "Run 'dotnet restore'"
+        }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    }
+  ]
+}

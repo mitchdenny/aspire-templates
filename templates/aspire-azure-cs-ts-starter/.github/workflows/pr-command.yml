@@ -1,0 +1,84 @@
+name: PR environment command
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions: {}
+
+jobs:
+  authorize:
+    if: >-
+      github.event.issue.pull_request &&
+      github.event.comment.user.type == 'User' &&
+      (github.event.comment.body == '/deploy-pr' || github.event.comment.body == '/cleanup-pr')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    outputs:
+      action: ${{ steps.authorize.outputs.action }}
+      pr: ${{ steps.authorize.outputs.pr }}
+      head_sha: ${{ steps.authorize.outputs.head_sha }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Check live permission and PR identity
+        id: authorize
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const { run } = await import(`${process.env.GITHUB_WORKSPACE}/.github/pr-environments/lifecycle.mjs`);
+            await run({ github, context, core }, 'authorize');
+
+  operation:
+    needs: authorize
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+      id-token: write
+    uses: ./.github/workflows/pr-operation.yml
+    with:
+      operation: ${{ needs.authorize.outputs.action }}
+      pr: ${{ needs.authorize.outputs.pr }}
+      head_sha: ${{ needs.authorize.outputs.head_sha }}
+    secrets: inherit
+
+  report:
+    if: >-
+      always() &&
+      github.event.issue.pull_request &&
+      github.event.comment.user.type == 'User' &&
+      (github.event.comment.body == '/deploy-pr' || github.event.comment.body == '/cleanup-pr')
+    needs: [authorize, operation]
+    runs-on: ubuntu-latest
+    environment: pr
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Update the command result comment
+        uses: actions/github-script@v9
+        env:
+          OPERATION_OUTCOME: ${{ needs.operation.outputs.outcome }}
+          AUTHORIZATION_RESULT: ${{ needs.authorize.result }}
+          OPERATION_RESULT: ${{ needs.operation.result }}
+          VERIFIED_TARGET: ${{ needs.operation.outputs.verified_target }}
+          GH_TOKEN: ${{ github.token }}
+          PR_STATE_KEY: ${{ secrets.PR_STATE_KEY }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        with:
+          script: |
+            const { run } = await import(`${process.env.GITHUB_WORKSPACE}/.github/pr-environments/lifecycle.mjs`);
+            await run({ github, context, core }, 'report');
