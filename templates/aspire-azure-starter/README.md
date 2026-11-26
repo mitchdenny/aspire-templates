@@ -16,6 +16,10 @@ aspire run
 Local development does not require Azure credentials. Caching requires a supported
 container runtime.
 
+The included `.gitignore` starts from GitHub's
+[VisualStudio.gitignore](https://github.com/github/gitignore/blob/90e1bba3f058319173bcece4f1ff62f5cf18ee53/VisualStudio.gitignore)
+(CC0), with additional local IDE/macOS exclusions.
+
 ## Next Steps
 
 ### Optional guided setup
