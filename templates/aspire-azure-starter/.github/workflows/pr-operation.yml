@@ -1,0 +1,157 @@
+name: PR environment lifecycle
+
+on:
+  workflow_call:
+    inputs:
+      operation:
+        required: true
+        type: string
+      pr:
+        required: true
+        type: string
+      head_sha:
+        default: ''
+        type: string
+    outputs:
+      outcome:
+        value: ${{ jobs.operation.outputs.outcome }}
+      verified_target:
+        value: ${{ jobs.operation.outputs.verified_target }}
+
+permissions: {}
+
+jobs:
+  operation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment: pr
+    concurrency:
+      group: aspire-pr-${{ github.repository_id }}-${{ inputs.pr }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+      id-token: write
+    outputs:
+      outcome: ${{ steps.finalize.outputs.outcome }}
+      verified_target: ${{ steps.finalize.outputs.verified_target }}
+    env:
+      PR_NUMBER: ${{ inputs.pr }}
+      OPERATION: ${{ inputs.operation }}
+      HEAD_SHA: ${{ inputs.head_sha }}
+      ASPIRE_VERSION: HostingAppHostPackageVersion
+      APPHOST_PATH: app/src/Aspire-StarterApplication.1.AppHost/Aspire-StarterApplication.1.AppHost.csproj
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: '1'
+      DOTNET_GENERATE_ASPNET_CERTIFICATE: 'false'
+      ASPIRE_CLI_TELEMETRY_OPTOUT: 'true'
+    steps:
+      - name: Isolate Aspire state for this runner and PR
+        shell: bash
+        run: echo "ASPIRE_HOME=$RUNNER_TEMP/aspire-home" >> "$GITHUB_ENV"
+
+      - name: Checkout trusted lifecycle implementation
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          path: control
+          persist-credentials: false
+
+      - name: Sign in with the PR environment identity
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Revalidate target and restore authenticated native state
+        id: prepare
+        uses: actions/github-script@v9
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_STATE_KEY: ${{ secrets.PR_STATE_KEY }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        with:
+          script: |
+            const { run } = await import(`${process.env.GITHUB_WORKSPACE}/control/.github/pr-environments/lifecycle.mjs`);
+            await run({ github, context, core }, 'prepare');
+
+      - name: Checkout the authorized PR head for deployment
+        if: steps.prepare.outputs.execute == 'true' && inputs.operation == 'deploy'
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.head_sha }}
+          path: app
+          persist-credentials: false
+
+      - name: Checkout trusted default-branch AppHost for native teardown
+        if: steps.prepare.outputs.execute == 'true' && inputs.operation != 'deploy'
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          path: app
+          persist-credentials: false
+
+      - name: Set up .NET
+        if: steps.prepare.outputs.execute == 'true'
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: TemplateDotnetSdkVersion
+          dotnet-quality: TemplateDotnetSdkQuality
+
+      - name: Install matching Aspire CLI
+        if: steps.prepare.outputs.execute == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location https://aspire.dev/install.sh -o "$RUNNER_TEMP/install-aspire.sh"
+          bash "$RUNNER_TEMP/install-aspire.sh" --version "$ASPIRE_VERSION"
+          echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
+
+      - name: Execute the isolated native lifecycle operation
+        id: native
+        if: steps.prepare.outputs.execute == 'true'
+        shell: bash
+        env:
+          Azure__SubscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          Azure__TenantId: ${{ secrets.AZURE_TENANT_ID }}
+          Azure__Location: ${{ vars.AZURE_LOCATION }}
+          Azure__ResourceGroup: ${{ steps.prepare.outputs.resource_group }}
+          Azure__CredentialSource: AzureCli
+        run: |
+          set -euo pipefail
+          umask 077
+          : "${Azure__Location:?Set AZURE_LOCATION in the pr environment}"
+          if [ "$OPERATION" = deploy ]; then
+            aspire deploy --apphost "$APPHOST_PATH" --environment "pr-$PR_NUMBER" --non-interactive \
+              > "$RUNNER_TEMP/native-lifecycle.log" 2>&1
+          else
+            aspire destroy --apphost "$APPHOST_PATH" --environment "pr-$PR_NUMBER" --yes --non-interactive \
+              > "$RUNNER_TEMP/native-lifecycle.log" 2>&1
+          fi
+
+      - name: Verify live ownership and persist encrypted state
+        id: finalize
+        if: always() && steps.prepare.outcome == 'success'
+        uses: actions/github-script@v9
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NATIVE_OUTCOME: ${{ steps.native.outcome }}
+          PR_STATE_KEY: ${{ secrets.PR_STATE_KEY }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        with:
+          script: |
+            const { run } = await import(`${process.env.GITHUB_WORKSPACE}/control/.github/pr-environments/lifecycle.mjs`);
+            await run({ github, context, core }, 'finalize');
+
+      - name: Save only encrypted deployment state
+        if: always() && steps.finalize.outputs.save_state == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ steps.finalize.outputs.artifact_name }}
+          path: ${{ runner.temp }}/encrypted-state/state.enc
+          if-no-files-found: error
+          retention-days: 90
