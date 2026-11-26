@@ -4,6 +4,10 @@ A Blazor frontend and ASP.NET Core API orchestrated by Aspire and ready to deplo
 to Azure Container Apps. If you enabled caching when creating this project, local
 runs use a Redis container and deployments use Azure Managed Redis.
 
+Application projects (AppHost, API, Web and ServiceDefaults) live under `src/`.
+Optional integration tests live under `tests/`. The solution, Aspire configuration
+and GitHub workflows/skills stay at the repository root.
+
 ## Run locally
 
 Install the .NET SDK for this project's target framework and the

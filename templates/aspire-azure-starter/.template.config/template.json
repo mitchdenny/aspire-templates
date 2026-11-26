@@ -54,7 +54,7 @@
         {
           "condition": "(TestFx == None)",
           "exclude": [
-            "Aspire-StarterApplication.1.Tests/**/*.*"
+            "tests/Aspire-StarterApplication.1.Tests/**/*.*"
           ]
         }
       ]
@@ -548,19 +548,19 @@
       "condition": "(hostIdentifier == \"dotnetcli\" || hostIdentifier == \"dotnetcli-preview\")"
     },
     {
-      "path": "Aspire-StarterApplication.1.AppHost\\Aspire-StarterApplication.1.AppHost.csproj"
+      "path": "src/Aspire-StarterApplication.1.AppHost\\Aspire-StarterApplication.1.AppHost.csproj"
     },
     {
-      "path": "Aspire-StarterApplication.1.ServiceDefaults\\Aspire-StarterApplication.1.ServiceDefaults.csproj"
+      "path": "src/Aspire-StarterApplication.1.ServiceDefaults\\Aspire-StarterApplication.1.ServiceDefaults.csproj"
     },
     {
-      "path": "Aspire-StarterApplication.1.ApiService\\Aspire-StarterApplication.1.ApiService.csproj"
+      "path": "src/Aspire-StarterApplication.1.ApiService\\Aspire-StarterApplication.1.ApiService.csproj"
     },
     {
-      "path": "Aspire-StarterApplication.1.Web\\Aspire-StarterApplication.1.Web.csproj"
+      "path": "src/Aspire-StarterApplication.1.Web\\Aspire-StarterApplication.1.Web.csproj"
     },
     {
-      "path": "Aspire-StarterApplication.1.Tests\\Aspire-StarterApplication.1.Tests.csproj",
+      "path": "tests/Aspire-StarterApplication.1.Tests\\Aspire-StarterApplication.1.Tests.csproj",
       "condition": "(TestFx != None)"
     }
   ],

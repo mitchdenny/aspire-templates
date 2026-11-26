@@ -41,7 +41,7 @@ jobs:
       OPERATION: ${{ inputs.operation }}
       HEAD_SHA: ${{ inputs.head_sha }}
       ASPIRE_VERSION: HostingAppHostPackageVersion
-      APPHOST_PATH: app/Aspire-StarterApplication.1.AppHost/Aspire-StarterApplication.1.AppHost.csproj
+      APPHOST_PATH: app/src/Aspire-StarterApplication.1.AppHost/Aspire-StarterApplication.1.AppHost.csproj
       DOTNET_CLI_TELEMETRY_OPTOUT: '1'
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: '1'
       DOTNET_GENERATE_ASPNET_CERTIFICATE: 'false'
@@ -107,11 +107,11 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-          cache-dependency-path: app/frontend/package-lock.json
+          cache-dependency-path: app/src/frontend/package-lock.json
 
       - name: Restore frontend dependencies for deployment
         if: steps.prepare.outputs.execute == 'true' && inputs.operation == 'deploy'
-        working-directory: app/frontend
+        working-directory: app/src/frontend
         run: npm ci
 
       - name: Install matching Aspire CLI

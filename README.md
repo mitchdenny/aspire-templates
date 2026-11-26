@@ -21,6 +21,7 @@ the workflow's CLI version to the shared Aspire package version and select the
 | `aspire-azure-react-starter` | React/TypeScript Vite frontend, ASP.NET Core server and C# AppHost |
 
 Both include Azure Container Apps deployment, authorized PR environment workflows,
+application sources under `src/` (optional Blazor integration tests under `tests/`),
 the `setup-cicd` skill and a generated Visual Studio `.gitignore`. The React
 starter is based on the official
 [`aspire-ts-cs-starter`](https://github.com/microsoft/aspire/tree/b2baebe8864c718587bd7d13cfe5460a80f83062/src/Aspire.ProjectTemplates/templates/aspire-ts-cs-starter),

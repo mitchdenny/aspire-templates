@@ -377,13 +377,13 @@
       "condition": "(hostIdentifier == \"dotnetcli\" || hostIdentifier == \"dotnetcli-preview\")"
     },
     {
-      "path": "Aspire-StarterApplication.1.AppHost\\Aspire-StarterApplication.1.AppHost.csproj"
+      "path": "src/Aspire-StarterApplication.1.AppHost\\Aspire-StarterApplication.1.AppHost.csproj"
     },
     {
-      "path": "Aspire-StarterApplication.1.Server\\Aspire-StarterApplication.1.Server.csproj"
+      "path": "src/Aspire-StarterApplication.1.Server\\Aspire-StarterApplication.1.Server.csproj"
     },
     {
-      "path": "frontend\\frontend.esproj"
+      "path": "src/frontend\\frontend.esproj"
     }
   ],
   "postActions": [

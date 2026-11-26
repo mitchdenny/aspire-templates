@@ -13,6 +13,9 @@ use the pinned source's `eng/Versions.props`.
 If you enabled caching when creating this project, local
 runs use a Redis container and deployments use Azure Managed Redis.
 
+Application projects and the frontend live under `src/`. The solution,
+Aspire configuration and GitHub workflows/skills stay at the repository root.
+
 ## Run locally
 
 Install Node.js 24 LTS, the .NET SDK for this project's target framework and the
@@ -26,7 +29,7 @@ Local development does not require Azure credentials. Caching requires a support
 container runtime.
 
 For frontend-only checks, run `npm ci`, `npm run lint` and `npm run build` in
-`frontend`. CI runs these checks before publishing. The upstream framework,
+`src/frontend`. CI runs these checks before publishing. The upstream framework,
 Redis, HTTPS and `.dev.localhost` options are preserved; this starter has no
 Blazor frontend or optional integration-test project.
 

@@ -41,7 +41,7 @@ jobs:
       OPERATION: ${{ inputs.operation }}
       HEAD_SHA: ${{ inputs.head_sha }}
       ASPIRE_VERSION: HostingAppHostPackageVersion
-      APPHOST_PATH: app/Aspire-StarterApplication.1.AppHost/Aspire-StarterApplication.1.AppHost.csproj
+      APPHOST_PATH: app/src/Aspire-StarterApplication.1.AppHost/Aspire-StarterApplication.1.AppHost.csproj
       DOTNET_CLI_TELEMETRY_OPTOUT: '1'
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: '1'
       DOTNET_GENERATE_ASPNET_CERTIFICATE: 'false'

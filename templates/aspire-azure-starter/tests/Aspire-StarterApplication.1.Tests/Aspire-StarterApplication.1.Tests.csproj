@@ -38,7 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\XmlEncodedProjectName.AppHost\XmlEncodedProjectName.AppHost.csproj" />
+    <ProjectReference Include="..\..\src\XmlEncodedProjectName.AppHost\XmlEncodedProjectName.AppHost.csproj" />
   </ItemGroup>
 
   <ItemGroup>

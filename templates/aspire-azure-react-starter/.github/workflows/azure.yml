@@ -37,10 +37,10 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: src/frontend/package-lock.json
 
       - name: Build frontend
-        working-directory: frontend
+        working-directory: src/frontend
         run: |
           npm ci
           npm run lint
@@ -48,11 +48,11 @@ jobs:
 
       - name: Build application
         run: |
-          dotnet build Aspire-StarterApplication.1.AppHost/Aspire-StarterApplication.1.AppHost.csproj --configuration Release
-          dotnet build Aspire-StarterApplication.1.Server/Aspire-StarterApplication.1.Server.csproj --configuration Release
+          dotnet build src/Aspire-StarterApplication.1.AppHost/Aspire-StarterApplication.1.AppHost.csproj --configuration Release
+          dotnet build src/Aspire-StarterApplication.1.Server/Aspire-StarterApplication.1.Server.csproj --configuration Release
 
       - name: Publish deployment artifacts
-        run: aspire publish --apphost Aspire-StarterApplication.1.AppHost/Aspire-StarterApplication.1.AppHost.csproj --environment Production --output-path "$RUNNER_TEMP/aspire-output" --non-interactive
+        run: aspire publish --apphost src/Aspire-StarterApplication.1.AppHost/Aspire-StarterApplication.1.AppHost.csproj --environment Production --output-path "$RUNNER_TEMP/aspire-output" --non-interactive
 
   deploy:
     name: Deploy production
@@ -90,10 +90,10 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: src/frontend/package-lock.json
 
       - name: Restore frontend dependencies
-        working-directory: frontend
+        working-directory: src/frontend
         run: npm ci
 
       - name: Check production configuration
@@ -125,4 +125,4 @@ jobs:
           Azure__Location: ${{ vars.AZURE_LOCATION }}
           Azure__ResourceGroup: ${{ vars.AZURE_RESOURCE_GROUP }}
           Azure__CredentialSource: AzureCli
-        run: aspire deploy --apphost Aspire-StarterApplication.1.AppHost/Aspire-StarterApplication.1.AppHost.csproj --environment Production --non-interactive
+        run: aspire deploy --apphost src/Aspire-StarterApplication.1.AppHost/Aspire-StarterApplication.1.AppHost.csproj --environment Production --non-interactive

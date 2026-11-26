@@ -6,8 +6,10 @@ description: Use when explicitly asked to create this Aspire app's private GitHu
 # Set up CI/CD
 
 Use GitHub/Azure CLI and API calls, respecting native permission prompts. Read the
-AppHost and `.github/workflows` for paths, versions and configuration. Do not use
-browser-based profile, billing or licensing investigation, or speculative plan
+AppHost and `.github/workflows` for paths, versions and configuration. Application
+sources live under `src/`, optional integration tests under `tests/`, and the
+solution/Aspire configuration stay at root. Do not use browser-based profile,
+billing or licensing investigation, or speculative plan
 checks. Attempt required operations directly; report concrete API failures.
 
 ## Missing inputs only
