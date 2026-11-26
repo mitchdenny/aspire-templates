@@ -13,10 +13,10 @@
     "TypeScript",
     "React"
   ],
-  "name": "aspire-azure-cs-ts-starter",
+  "name": "aspire-azure-react-starter",
   "defaultName": "AspireApp",
-  "description": "React and C# starter on Azure Container Apps, with optional Azure Managed Redis caching.",
-  "shortName": "aspire-azure-cs-ts-starter",
+  "description": "React starter on Azure Container Apps",
+  "shortName": "aspire-azure-react-starter",
   "sourceName": "Aspire-StarterApplication.1",
   "preferNameDirectory": false,
   "tags": {
@@ -25,9 +25,9 @@
     "editorTreatAs": "solution"
   },
   "precedence": "9000",
-  "identity": "Personal.Aspire.Azure.CSharp.TypeScript",
+  "identity": "Personal.Aspire.Azure.React",
   "thirdPartyNotices": "https://aka.ms/aspire/third-party-notices",
-  "groupIdentity": "Personal.Aspire.Azure.CSharp.TypeScript",
+  "groupIdentity": "Personal.Aspire.Azure.React",
   "guids": [
     "98048C9C-BF28-46BA-A98E-63767EE5E3A8"
   ],

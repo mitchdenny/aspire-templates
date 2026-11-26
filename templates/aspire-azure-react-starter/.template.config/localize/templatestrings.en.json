@@ -1,7 +1,7 @@
 {
   "author": "Microsoft",
-  "name": "Aspire Starter App (ASP.NET Core/React, C# AppHost)",
-  "description": "A project template for creating an Aspire app with a React frontend and a C# Minimal API backend service, with optional Redis caching.",
+  "name": "aspire-azure-react-starter",
+  "description": "React starter on Azure Container Apps",
   "symbols/Framework/description": "The target framework for the project.",
   "symbols/Framework/choices/net10.0/description": "Target net10.0",
   "symbols/Framework/choices/net11.0/description": "Target net11.0",

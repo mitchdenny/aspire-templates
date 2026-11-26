@@ -18,7 +18,7 @@ the workflow's CLI version to the shared Aspire package version and select the
 | Template | Layout |
 |----------|--------|
 | `aspire-azure-starter` | Blazor frontend and ASP.NET Core API |
-| `aspire-azure-cs-ts-starter` | React/TypeScript Vite frontend, ASP.NET Core server and C# AppHost |
+| `aspire-azure-react-starter` | React/TypeScript Vite frontend, ASP.NET Core server and C# AppHost |
 
 Both include Azure Container Apps deployment, authorized PR environment workflows,
 the `setup-cicd` skill and a generated Visual Studio `.gitignore`. The React
@@ -48,7 +48,7 @@ runtime; local development does not require Azure credentials.
 If the CLI detects an organizational configuration source, add
 `--use-config-source false` to use only this starter.
 
-For the React starter, use `--template-path ./templates/aspire-azure-cs-ts-starter`
+For the React starter, use `--template-path ./templates/aspire-azure-react-starter`
 instead. It supports caching, framework, HTTPS and `.dev.localhost` options,
 but does not include the Blazor starter's optional test project.
 
